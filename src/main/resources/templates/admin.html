@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ-панель</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; }
+        .navbar { background: linear-gradient(135deg, #343a40, #212529); }
+        .card { transition: all 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+        .stat-number { font-size: 2.2rem; font-weight: bold; color: #0d6efd; }
+        .table th { background: #343a40; color: white; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/admin">
+            <i class="bi bi-shield-lock"></i> Админ-панель
+        </a>
+        <div>
+            <span class="text-light me-3"> admin</span>
+            <!-- ИЗМЕНЕНО: правильный логаут (была ссылка, теперь форма) -->
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-box-arrow-right"></i> Выйти
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold">Панель управления</h1>
+        <a href="/admin/add-poll" class="btn btn-success btn-lg">
+            <i class="bi bi-plus-circle"></i> Добавить новый опрос
+        </a>
+    </div>
+
+    <div th:if="${polls.isEmpty()}" class="alert alert-info text-center py-4">
+        Пока нет опросов. Добавьте первый!
+    </div>
+
+    <div class="row" th:each="poll : ${polls}">
+        <div class="col-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0" th:text="${poll.question}"></h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>Вариант ответа</th>
+                            <th class="text-center">Голосов</th>
+                            <th>Возрасты проголосовавших</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="option : ${poll.options}">
+                            <td><strong th:text="${option.text}"></strong></td>
+                            <td class="text-center">
+                                <span class="stat-number" th:text="${#lists.size(option.votes)}"></span>
+                            </td>
+                            <td>
+                                <div th:if="${#lists.size(option.votes) > 0}" class="d-flex flex-wrap gap-1">
+                                        <span th:each="vote : ${option.votes}"
+                                              class="badge bg-secondary"
+                                              th:text="${vote.age != null ? vote.age + ' лет' : '—'}"></span>
+                                </div>
+                                <span th:if="${#lists.size(option.votes) == 0}" class="text-muted">—</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

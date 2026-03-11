@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Добавить опрос</title>
+</head>
+<body>
+<h1>Добавить новый опрос</h1>
+<form th:action="@{/admin/add-poll}" th:object="${poll}" method="post">
+    <label>Вопрос:</label>
+    <input type="text" th:field="*{question}"/><br/>
+    <label>Варианты (добавьте несколько):</label><br/>
+    <input type="text" name="options"/><br/>
+    <input type="text" name="options"/><br/>
+    <input type="text" name="options"/><br/>
+    <button type="submit">Сохранить</button>
+</form>
+<a href="/admin">Назад</a>
+</body>
+</html>
