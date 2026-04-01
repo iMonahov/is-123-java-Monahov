@@ -3,9 +3,7 @@ package com.example.is_123_java_Monahov.service.impl;
 import com.example.is_123_java_Monahov.model.Option;
 import com.example.is_123_java_Monahov.model.Poll;
 import com.example.is_123_java_Monahov.model.Vote;
-import com.example.is_123_java_Monahov.repository.OptionRepository;
 import com.example.is_123_java_Monahov.repository.PollRepository;
-import com.example.is_123_java_Monahov.repository.VoteRepository;
 import com.example.is_123_java_Monahov.service.PollService;
 import com.example.is_123_java_Monahov.service.strategy.VotingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +16,9 @@ public class PollServiceImpl implements PollService {
 
     @Autowired
     private PollRepository pollRepository;
-    @Autowired
-    private OptionRepository optionRepository;
-    @Autowired
-    private VoteRepository voteRepository;
 
     @Autowired
-    private VotingStrategy votingStrategy;   // ← Strategy паттерн
+    private VotingStrategy votingStrategy;
 
     @Override
     public List<Poll> getAllPolls() {
@@ -33,26 +27,27 @@ public class PollServiceImpl implements PollService {
 
     @Override
     public Poll getPollById(Long id) {
-        return pollRepository.findById(id).orElse(null);
+        return pollRepository.findById(id);
     }
 
     @Override
     public void savePoll(Poll poll) {
+        // Сохраняем опрос в базу данных
         pollRepository.save(poll);
     }
 
     @Override
     public void vote(Long optionId, Integer age) {
-        votingStrategy.castVote(optionId, age);   // используем стратегию
+        votingStrategy.castVote(optionId, age);
     }
 
     @Override
     public long getVotesCountByOption(Option option) {
-        return option.getVotes().size();
+        return pollRepository.getVotesCountByOption(option.getId());
     }
 
     @Override
     public List<Vote> getVotesByOption(Option option) {
-        return option.getVotes();
+        return pollRepository.getVotesByOption(option.getId());
     }
 }

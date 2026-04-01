@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -32,13 +33,30 @@ public class AdminController {
     }
 
     @PostMapping("/add-poll")
-    public String addPoll(@ModelAttribute Poll poll, @RequestParam List<String> options) {
-        for (String opt : options) {
-            if (!opt.isEmpty()) {
-                poll.getOptions().add(new Option(opt, poll));
+    public String addPoll(@RequestParam("question") String question,
+                          @RequestParam(value = "options", required = false) List<String> options) {
+
+        // Создаем новый опрос
+        Poll poll = new Poll();
+        poll.setQuestion(question);
+
+        // Создаем список вариантов ответов
+        List<Option> optionList = new ArrayList<>();
+        if (options != null) {
+            for (String opt : options) {
+                if (opt != null && !opt.trim().isEmpty()) {
+                    optionList.add(new Option(opt.trim(), null));
+                }
             }
         }
-        pollService.savePoll(poll);
+
+        poll.setOptions(optionList);
+
+        // Сохраняем опрос в базу данных
+        if (!optionList.isEmpty()) {
+            pollService.savePoll(poll);
+        }
+
         return "redirect:/admin";
     }
 }

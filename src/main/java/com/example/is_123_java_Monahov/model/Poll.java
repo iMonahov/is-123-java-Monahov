@@ -1,20 +1,13 @@
 package com.example.is_123_java_Monahov.model;
 
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 public class Poll {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String question;
-
-    @OneToMany(mappedBy = "poll", cascade = CascadeType.ALL)
     private List<Option> options = new ArrayList<>();
 
-    // Getters/Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getQuestion() { return question; }
