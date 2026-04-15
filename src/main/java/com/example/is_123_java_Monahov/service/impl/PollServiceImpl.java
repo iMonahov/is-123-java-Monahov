@@ -22,17 +22,23 @@ public class PollServiceImpl implements PollService {
 
     @Override
     public List<Poll> getAllPolls() {
-        return pollRepository.findAll();
+        return pollRepository.findBySurveyId(null); // Временно, потом исправим
     }
 
     @Override
     public Poll getPollById(Long id) {
-        return pollRepository.findById(id);
+        // Временно, потом исправим
+        List<Poll> polls = pollRepository.findBySurveyId(null);
+        for (Poll poll : polls) {
+            if (poll.getId().equals(id)) {
+                return poll;
+            }
+        }
+        return null;
     }
 
     @Override
     public void savePoll(Poll poll) {
-        // Сохраняем опрос в базу данных
         pollRepository.save(poll);
     }
 

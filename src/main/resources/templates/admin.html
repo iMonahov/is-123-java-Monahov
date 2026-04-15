@@ -12,6 +12,8 @@
         .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
         .stat-number { font-size: 2.2rem; font-weight: bold; color: #0d6efd; }
         .table th { background: #343a40; color: white; }
+        .btn-logout { background: linear-gradient(135deg, #dc3545, #c82333); border: none; }
+        .btn-logout:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -22,10 +24,9 @@
             <i class="bi bi-shield-lock"></i> Админ-панель
         </a>
         <div>
-            <span class="text-light me-3"> admin</span>
-            <!-- ИЗМЕНЕНО: правильный логаут (была ссылка, теперь форма) -->
+            <span class="text-light me-3">admin</span>
             <form th:action="@{/logout}" method="post" class="d-inline">
-                <button type="submit" class="btn btn-outline-light btn-sm">
+                <button type="submit" class="btn btn-logout text-white btn-sm">
                     <i class="bi bi-box-arrow-right"></i> Выйти
                 </button>
             </form>
@@ -36,47 +37,52 @@
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="display-5 fw-bold">Панель управления</h1>
-        <a href="/admin/add-poll" class="btn btn-success btn-lg">
+        <a href="/admin/add-survey" class="btn btn-success btn-lg">
             <i class="bi bi-plus-circle"></i> Добавить новый опрос
         </a>
     </div>
 
-    <div th:if="${polls.isEmpty()}" class="alert alert-info text-center py-4">
+    <div th:if="${surveys.isEmpty()}" class="alert alert-info text-center py-4">
         Пока нет опросов. Добавьте первый!
     </div>
 
-    <div class="row" th:each="poll : ${polls}">
+    <div class="row" th:each="survey : ${surveys}">
         <div class="col-12 mb-4">
             <div class="card shadow">
                 <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0" th:text="${poll.question}"></h5>
+                    <h4 class="mb-0" th:text="${survey.title}"></h4>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                        <tr>
-                            <th>Вариант ответа</th>
-                            <th class="text-center">Голосов</th>
-                            <th>Возрасты проголосовавших</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="option : ${poll.options}">
-                            <td><strong th:text="${option.text}"></strong></td>
-                            <td class="text-center">
-                                <span class="stat-number" th:text="${#lists.size(option.votes)}"></span>
-                            </td>
-                            <td>
-                                <div th:if="${#lists.size(option.votes) > 0}" class="d-flex flex-wrap gap-1">
-                                        <span th:each="vote : ${option.votes}"
-                                              class="badge bg-secondary"
-                                              th:text="${vote.age != null ? vote.age + ' лет' : '—'}"></span>
-                                </div>
-                                <span th:if="${#lists.size(option.votes) == 0}" class="text-muted">—</span>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <div th:each="poll : ${survey.polls}" class="border-bottom">
+                        <div class="p-3 bg-light">
+                            <h5 class="mb-2" th:text="${poll.question}"></h5>
+                        </div>
+                        <table class="table table-hover mb-0">
+                            <thead>
+                            <tr>
+                                <th>Вариант ответа</th>
+                                <th class="text-center">Голосов</th>
+                                <th>Возрасты проголосовавших</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="option : ${poll.options}">
+                                <td><strong th:text="${option.text}"></strong></td>
+                                <td class="text-center">
+                                    <span class="stat-number" th:text="${#lists.size(option.votes)}"></span>
+                                </td>
+                                <td>
+                                    <div th:if="${#lists.size(option.votes) > 0}" class="d-flex flex-wrap gap-1">
+                                            <span th:each="vote : ${option.votes}"
+                                                  class="badge bg-secondary"
+                                                  th:text="${vote.age != null ? vote.age + ' лет' : '—'}"></span>
+                                    </div>
+                                    <span th:if="${#lists.size(option.votes) == 0}" class="text-muted">—</span>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

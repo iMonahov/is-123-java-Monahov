@@ -2,7 +2,8 @@ package com.example.is_123_java_Monahov.controller;
 
 import com.example.is_123_java_Monahov.model.Option;
 import com.example.is_123_java_Monahov.model.Poll;
-import com.example.is_123_java_Monahov.service.PollService;
+import com.example.is_123_java_Monahov.model.Survey;
+import com.example.is_123_java_Monahov.service.SurveyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -18,44 +19,55 @@ import java.util.List;
 public class AdminController {
 
     @Autowired
-    private PollService pollService;
+    private SurveyService surveyService;
 
     @GetMapping
     public String adminDashboard(Model model) {
-        model.addAttribute("polls", pollService.getAllPolls());
+        model.addAttribute("surveys", surveyService.getAllSurveys());
         return "admin";
     }
 
-    @GetMapping("/add-poll")
-    public String addPollForm(Model model) {
-        model.addAttribute("poll", new Poll());
-        return "add-poll";
+    @GetMapping("/add-survey")
+    public String addSurveyForm(Model model) {
+        model.addAttribute("survey", new Survey());
+        return "add-survey";
     }
 
-    @PostMapping("/add-poll")
-    public String addPoll(@RequestParam("question") String question,
-                          @RequestParam(value = "options", required = false) List<String> options) {
+    @PostMapping("/add-survey")
+    public String addSurvey(@RequestParam("title") String title,
+                            @RequestParam("questions") List<String> questions,
+                            @RequestParam("options") List<String> allOptions) {
 
-        // Создаем новый опрос
-        Poll poll = new Poll();
-        poll.setQuestion(question);
+        Survey survey = new Survey();
+        survey.setTitle(title);
 
-        // Создаем список вариантов ответов
-        List<Option> optionList = new ArrayList<>();
-        if (options != null) {
-            for (String opt : options) {
-                if (opt != null && !opt.trim().isEmpty()) {
-                    optionList.add(new Option(opt.trim(), null));
+        List<Poll> polls = new ArrayList<>();
+        int optionIndex = 0;
+
+        for (String questionText : questions) {
+            if (questionText != null && !questionText.trim().isEmpty()) {
+                Poll poll = new Poll();
+                poll.setQuestion(questionText);
+
+                // Добавляем варианты ответов для этого вопроса
+                List<Option> options = new ArrayList<>();
+                // Предполагаем, что на каждый вопрос приходит 4 варианта
+                for (int i = 0; i < 4; i++) {
+                    if (optionIndex < allOptions.size()) {
+                        String opt = allOptions.get(optionIndex);
+                        if (opt != null && !opt.trim().isEmpty()) {
+                            options.add(new Option(opt.trim(), null));
+                        }
+                        optionIndex++;
+                    }
                 }
+                poll.setOptions(options);
+                polls.add(poll);
             }
         }
 
-        poll.setOptions(optionList);
-
-        // Сохраняем опрос в базу данных
-        if (!optionList.isEmpty()) {
-            pollService.savePoll(poll);
-        }
+        survey.setPolls(polls);
+        surveyService.saveSurvey(survey);
 
         return "redirect:/admin";
     }
