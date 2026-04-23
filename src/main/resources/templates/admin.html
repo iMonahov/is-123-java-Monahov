@@ -42,6 +42,27 @@
         </a>
     </div>
 
+    <!-- Быстрое создание шаблонных опросов -->
+    <div class="mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3"><i class="bi bi-magic"></i> Быстрое создание шаблонов</h5>
+                <div class="btn-group" role="group">
+                    <a href="/admin/create-sample/SATISFACTION" class="btn btn-outline-info">
+                        <i class="bi bi-emoji-smile"></i> Опрос удовлетворённости
+                    </a>
+                    <a href="/admin/create-sample/FEEDBACK" class="btn btn-outline-info">
+                        <i class="bi bi-chat-dots"></i> Опрос обратной связи
+                    </a>
+                    <a href="/admin/create-sample/PREFERENCE" class="btn btn-outline-info">
+                        <i class="bi bi-star"></i> Опрос предпочтений
+                    </a>
+                </div>
+                <small class="text-muted d-block mt-2">Создание готовых шаблонов опросов в один клик</small>
+            </div>
+        </div>
+    </div>
+
     <div th:if="${surveys.isEmpty()}" class="alert alert-info text-center py-4">
         Пока нет опросов. Добавьте первый!
     </div>

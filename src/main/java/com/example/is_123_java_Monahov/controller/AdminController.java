@@ -1,7 +1,8 @@
 package com.example.is_123_java_Monahov.controller;
 
-import com.example.is_123_java_Monahov.model.Option;
-import com.example.is_123_java_Monahov.model.Poll;
+import com.example.is_123_java_Monahov.builder.SurveyBuilder;
+import com.example.is_123_java_Monahov.factory.SurveyFactory;
+import com.example.is_123_java_Monahov.factory.SurveyType;
 import com.example.is_123_java_Monahov.model.Survey;
 import com.example.is_123_java_Monahov.service.SurveyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,12 @@ public class AdminController {
     @Autowired
     private SurveyService surveyService;
 
+    @Autowired
+    private SurveyBuilder surveyBuilder;
+
+    @Autowired
+    private SurveyFactory surveyFactory;
+
     @GetMapping
     public String adminDashboard(Model model) {
         model.addAttribute("surveys", surveyService.getAllSurveys());
@@ -33,40 +40,46 @@ public class AdminController {
         return "add-survey";
     }
 
+    @GetMapping("/create-sample/{type}")
+    public String createSampleSurvey(@PathVariable String type) {
+        SurveyType surveyType;
+        try {
+            surveyType = SurveyType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return "redirect:/admin?error=invalid_type";
+        }
+
+        Survey survey = surveyFactory.createSurvey(surveyType, null);
+        surveyService.saveSurvey(survey);
+        return "redirect:/admin";
+    }
+
     @PostMapping("/add-survey")
     public String addSurvey(@RequestParam("title") String title,
                             @RequestParam("questions") List<String> questions,
                             @RequestParam("options") List<String> allOptions) {
 
-        Survey survey = new Survey();
-        survey.setTitle(title);
+        surveyBuilder.reset();
+        surveyBuilder.setTitle(title);
 
-        List<Poll> polls = new ArrayList<>();
         int optionIndex = 0;
-
         for (String questionText : questions) {
             if (questionText != null && !questionText.trim().isEmpty()) {
-                Poll poll = new Poll();
-                poll.setQuestion(questionText);
-
-                // Добавляем варианты ответов для этого вопроса
-                List<Option> options = new ArrayList<>();
-                // Предполагаем, что на каждый вопрос приходит 4 варианта
-                for (int i = 0; i < 4; i++) {
-                    if (optionIndex < allOptions.size()) {
-                        String opt = allOptions.get(optionIndex);
-                        if (opt != null && !opt.trim().isEmpty()) {
-                            options.add(new Option(opt.trim(), null));
-                        }
-                        optionIndex++;
+                List<String> optionTexts = new ArrayList<>();
+                for (int i = 0; i < 4 && optionIndex < allOptions.size(); i++) {
+                    String opt = allOptions.get(optionIndex);
+                    if (opt != null && !opt.trim().isEmpty()) {
+                        optionTexts.add(opt.trim());
                     }
+                    optionIndex++;
                 }
-                poll.setOptions(options);
-                polls.add(poll);
+                if (!optionTexts.isEmpty()) {
+                    surveyBuilder.addPoll(questionText, optionTexts);
+                }
             }
         }
 
-        survey.setPolls(polls);
+        Survey survey = surveyBuilder.build();
         surveyService.saveSurvey(survey);
 
         return "redirect:/admin";
