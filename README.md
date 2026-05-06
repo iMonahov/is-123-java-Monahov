@@ -6,4 +6,3 @@
 - Команда для запуска .\mvnw spring-boot:run или mvn spring-boot:run
 - Откройте http://localhost:8080/
 
-База данных готова.
