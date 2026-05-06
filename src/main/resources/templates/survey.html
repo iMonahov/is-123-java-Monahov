@@ -10,13 +10,9 @@
         .navbar { background: linear-gradient(135deg, #343a40, #212529); }
         .card { border: none; border-radius: 15px; margin-bottom: 20px; }
         .btn-vote { background: linear-gradient(135deg, #28a745, #20c997); border: none; padding: 12px 40px; border-radius: 50px; }
-        .btn-vote:hover { transform: scale(1.05); }
         .btn-back { background: linear-gradient(135deg, #6c757d, #5a6268); border: none; padding: 12px 40px; border-radius: 50px; }
-        .btn-back:hover { transform: scale(1.05); }
-        .alert-success { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .question-card { transition: all 0.3s; }
-        .question-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .engine-switch { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
     </style>
 </head>
 <body>
@@ -39,14 +35,12 @@
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <!-- Сообщение об успешном голосовании -->
             <div th:if="${param.voted}" class="alert alert-success text-center shadow mb-4">
                 <i class="bi bi-check-circle-fill fs-3"></i>
                 <h4 class="mt-2">Спасибо за участие!</h4>
                 <p class="mb-0">Ваши ответы успешно сохранены.</p>
             </div>
 
-            <!-- Карточка опроса -->
             <div class="card shadow">
                 <div class="card-header bg-dark text-white text-center">
                     <h2 class="mb-0" th:text="${survey.title}"></h2>
@@ -66,21 +60,17 @@
                             </div>
                             <div class="card-body">
                                 <div th:each="option : ${poll.options}" class="form-check mb-2">
-                                    <input type="radio"
-                                           class="form-check-input"
+                                    <input type="radio" class="form-check-input"
                                            th:id="'q_' + ${poll.id} + '_opt_' + ${option.id}"
                                            th:name="'question_' + ${poll.id}"
-                                           th:value="${option.id}"
-                                           required>
+                                           th:value="${option.id}" required>
                                     <label class="form-check-label"
                                            th:for="'q_' + ${poll.id} + '_opt_' + ${option.id}"
-                                           th:text="${option.text}">
-                                    </label>
+                                           th:text="${option.text}"></label>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Возраст -->
                         <div class="card mb-4">
                             <div class="card-header bg-info text-white">
                                 <h5 class="mb-0"><i class="bi bi-person-badge"></i> Информация о вас</h5>
@@ -92,7 +82,6 @@
                             </div>
                         </div>
 
-                        <!-- Кнопки -->
                         <div class="d-flex justify-content-between gap-3">
                             <a href="/" class="btn btn-back text-white">
                                 <i class="bi bi-arrow-left"></i> К списку опросов
@@ -103,6 +92,19 @@
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="engine-switch">
+    <div class="card shadow-sm bg-dark">
+        <div class="card-body p-2">
+            <small class="text-white-50 d-block text-center mb-1">Движок шаблонов:</small>
+            <div class="btn-group btn-group-sm">
+                <a href="/" class="btn btn-success">Thymeleaf</a>
+                <a href="/jsp/" class="btn btn-outline-light">JSP</a>
+                <a href="/freemarker/" class="btn btn-outline-light">FreeMarker</a>
             </div>
         </div>
     </div>

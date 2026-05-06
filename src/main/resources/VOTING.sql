@@ -1,6 +1,6 @@
 SET NAMES WIN1251;
 SET SQL DIALECT 3;
-CONNECT 'localhost/3050:C:/Users/ibrau/Desktop/VOTINGDB.FDB' USER 'SYSDBA' PASSWORD 'masterkey';
+CONNECT 'localhost:3050/${user.dir}/src/main/resources/VOTINGDB.fdb' USER 'SYSDBA' PASSWORD 'masterkey';
 SET AUTODDL ON;
 
 /* VOTE */

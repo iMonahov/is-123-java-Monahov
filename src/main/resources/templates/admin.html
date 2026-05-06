@@ -12,8 +12,7 @@
         .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
         .stat-number { font-size: 2.2rem; font-weight: bold; color: #0d6efd; }
         .table th { background: #343a40; color: white; }
-        .btn-logout { background: linear-gradient(135deg, #dc3545, #c82333); border: none; }
-        .btn-logout:hover { transform: scale(1.05); }
+        .engine-switch { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
     </style>
 </head>
 <body>
@@ -26,7 +25,7 @@
         <div>
             <span class="text-light me-3">admin</span>
             <form th:action="@{/logout}" method="post" class="d-inline">
-                <button type="submit" class="btn btn-logout text-white btn-sm">
+                <button type="submit" class="btn btn-outline-light text-white btn-sm">
                     <i class="bi bi-box-arrow-right"></i> Выйти
                 </button>
             </form>
@@ -40,6 +39,26 @@
         <a href="/admin/add-survey" class="btn btn-success btn-lg">
             <i class="bi bi-plus-circle"></i> Добавить новый опрос
         </a>
+    </div>
+
+    <div class="mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-3"><i class="bi bi-magic"></i> Быстрое создание шаблонов</h5>
+                <div class="btn-group" role="group">
+                    <a href="/admin/create-sample/SATISFACTION" class="btn btn-outline-info">
+                        <i class="bi bi-emoji-smile"></i> Опрос удовлетворённости
+                    </a>
+                    <a href="/admin/create-sample/FEEDBACK" class="btn btn-outline-info">
+                        <i class="bi bi-chat-dots"></i> Опрос обратной связи
+                    </a>
+                    <a href="/admin/create-sample/PREFERENCE" class="btn btn-outline-info">
+                        <i class="bi bi-star"></i> Опрос предпочтений
+                    </a>
+                </div>
+                <small class="text-muted d-block mt-2">Создание готовых шаблонов опросов в один клик</small>
+            </div>
+        </div>
     </div>
 
     <div th:if="${surveys.isEmpty()}" class="alert alert-info text-center py-4">
@@ -84,6 +103,19 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="engine-switch">
+    <div class="card shadow-sm bg-dark">
+        <div class="card-body p-2">
+            <small class="text-white-50 d-block text-center mb-1">Движок шаблонов:</small>
+            <div class="btn-group btn-group-sm">
+                <a href="/" class="btn btn-success">Thymeleaf</a>
+                <a href="/jsp/" class="btn btn-outline-light">JSP</a>
+                <a href="/freemarker/" class="btn btn-outline-light">FreeMarker</a>
             </div>
         </div>
     </div>
