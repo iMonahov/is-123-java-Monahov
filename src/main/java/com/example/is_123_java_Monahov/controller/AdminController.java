@@ -4,6 +4,8 @@ import com.example.is_123_java_Monahov.builder.SurveyBuilder;
 import com.example.is_123_java_Monahov.factory.SurveyFactory;
 import com.example.is_123_java_Monahov.factory.SurveyType;
 import com.example.is_123_java_Monahov.model.Survey;
+import com.example.is_123_java_Monahov.model.VotingLink;
+import com.example.is_123_java_Monahov.repository.VotingLinkRepository;
 import com.example.is_123_java_Monahov.service.SurveyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,8 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/admin")
@@ -27,6 +31,9 @@ public class AdminController {
 
     @Autowired
     private SurveyFactory surveyFactory;
+
+    @Autowired
+    private VotingLinkRepository votingLinkRepository;
 
     @GetMapping
     public String adminDashboard(Model model) {
@@ -83,5 +90,68 @@ public class AdminController {
         surveyService.saveSurvey(survey);
 
         return "redirect:/admin";
+    }
+
+    // ========================================
+    // УПРАВЛЕНИЕ ВРЕМЕННЫМИ ССЫЛКАМИ
+    // ========================================
+
+    /**
+     * Страница управления ссылками для конкретного опроса
+     */
+    @GetMapping("/links/{surveyId}")
+    public String manageLinks(@PathVariable Long surveyId, Model model, @RequestParam(required = false) String url) {
+        Survey survey = surveyService.getSurveyById(surveyId);
+        if (survey == null) {
+            return "redirect:/admin";
+        }
+        List<VotingLink> links = votingLinkRepository.findBySurveyId(surveyId);
+        model.addAttribute("survey", survey);
+        model.addAttribute("links", links);
+        model.addAttribute("createdUrl", url);
+        return "survey-links";
+    }
+
+    /**
+     * Форма создания новой ссылки (опционально, можно использовать прямо на странице links)
+     */
+    @GetMapping("/create-link/{surveyId}")
+    public String createLinkForm(@PathVariable Long surveyId, Model model) {
+        Survey survey = surveyService.getSurveyById(surveyId);
+        if (survey == null) {
+            return "redirect:/admin";
+        }
+        model.addAttribute("survey", survey);
+        return "create-link";
+    }
+
+    /**
+     * Создание временной ссылки для голосования
+     * @param surveyId ID опроса
+     * @param hoursValid срок действия в часах (по умолчанию 24)
+     * @param maxVotes максимальное количество голосов (опционально)
+     */
+    @PostMapping("/create-link")
+    public String createVotingLink(@RequestParam Long surveyId,
+                                   @RequestParam(required = false) Integer hoursValid,
+                                   @RequestParam(required = false) Integer maxVotes) {
+
+        // Генерируем уникальный токен (8 символов)
+        String token = UUID.randomUUID().toString().substring(0, 8);
+
+        // Срок действия: если не указан, то 24 часа
+        int hours = (hoursValid != null && hoursValid > 0) ? hoursValid : 24;
+        LocalDateTime expiresAt = LocalDateTime.now().plusHours(hours);
+
+        // Максимум голосов: если не указан или <=0, то без ограничений
+        Integer maxVotesLimit = (maxVotes != null && maxVotes > 0) ? maxVotes : null;
+
+        VotingLink link = new VotingLink(token, surveyId, expiresAt, maxVotesLimit);
+        votingLinkRepository.save(link);
+
+        // Формируем полную ссылку для отправки
+        String shareUrl = "http://localhost:8080/vote/" + token;
+
+        return "redirect:/admin/links/" + surveyId + "?url=" + shareUrl;
     }
 }

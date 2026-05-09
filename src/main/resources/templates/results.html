@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Результаты голосования</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #17212b;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tg-card {
+            background: #1e2a36;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .tg-card-header {
+            padding: 20px 20px 12px;
+            border-bottom: 1px solid #2b3b47;
+        }
+
+        .tg-card-header h1 {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .tg-card-body {
+            padding: 20px;
+        }
+
+        .question-result {
+            margin-bottom: 28px;
+        }
+
+        .question-title {
+            color: #e5e9ec;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2b3b47;
+        }
+
+        .option-row {
+            margin-bottom: 14px;
+        }
+
+        .option-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            color: #8c9aa6;
+            font-size: 13px;
+        }
+
+        .option-text {
+            color: #e5e9ec;
+            font-weight: 500;
+        }
+
+        .option-stats {
+            color: #31b4ff;
+        }
+
+        .progress-bar {
+            background: #2b3b47;
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #31b4ff;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .back-btn {
+            background: #2b3b47;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 20px;
+            width: 100%;
+            color: #e5e9ec;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            text-decoration: none;
+            margin-top: 16px;
+        }
+
+        .back-btn:hover {
+            background: #3b4b57;
+        }
+
+        .info-banner {
+            background: #ff3b3020;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        hr {
+            border-color: #2b3b47;
+            margin: 16px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="tg-card">
+        <div class="tg-card-header">
+            <h1 th:text="${survey.title}">Результаты</h1>
+        </div>
+        <div class="tg-card-body">
+            <div th:if="${linkExpired}" class="info-banner">
+                Эта ссылка истекла. Результаты доступны только для просмотра.
+            </div>
+
+            <div th:each="poll, pollStat : ${survey.polls}">
+                <div class="question-result">
+                    <div class="question-title" th:text="${poll.question}"></div>
+
+                    <div th:each="result : ${resultsByPoll.get(poll.id)}">
+                        <div class="option-row">
+                            <div class="option-label">
+                                <span class="option-text" th:text="${result.optionText}"></span>
+                                <span class="option-stats">
+                                    <span th:text="${result.votesCount}"></span> голосов ·
+                                    <span th:text="${result.percentageInt}"></span>%
+                                </span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" th:style="'width: ' + ${result.percentage} + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 8px; color: #5e8ea3; font-size: 12px; text-align: right;">
+                        Всего: <span th:text="${totalVotesByPoll.get(poll.id)}"></span> голосов
+                    </div>
+                </div>
+                <hr th:if="${!pollStat.last}">
+            </div>
+
+            <a th:href="@{/}" class="back-btn">На главную</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
