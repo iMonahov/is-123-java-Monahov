@@ -6,6 +6,7 @@ import com.example.is_123_java_Monahov.model.Survey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,7 +41,11 @@ class SurveyBuilderTest {
 
     @Test
     void testAddPoll_WithNullOptions_ShouldSkipNulls() {
-        List<String> options = List.of("Вариант 1", null, "Вариант 3", "");
+        List<String> options = new ArrayList<>();
+        options.add("Вариант 1");
+        options.add(null);
+        options.add("Вариант 3");
+        options.add("");
 
         surveyBuilder.setTitle("Тест");
         surveyBuilder.addPoll("Вопрос?", options);
